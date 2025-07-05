@@ -57,6 +57,7 @@ python thinkinrock.py
 
 Contributions are welcome via issues and pull requests!
 
+If you found this useful, or cool, or whatever, chuck me a star!
 ---
 
 ## 📜 License
