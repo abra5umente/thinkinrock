@@ -19,12 +19,11 @@
 - A working [Automatic1111 (Stable Diffusion WebUI)](https://github.com/AUTOMATIC1111/stable-diffusion-webui) instance accessible locally.
 - A `.env` (example included) file containing optional config overrides:
   ```env
-  SAMPLER_NAME=DPM++ 2M SDE
-  SCHEDULER_NAME=Karras
-  IMAGE_WIDTH=1024
-  IMAGE_HEIGHT=1024
-  CFG_SCALE=4.5
-  STEPS=30
+SAMPLER_NAME="DPM++ 2M SDE"
+SCHEDULER_NAME="Karras"
+IMAGE_HEIGHT=1024
+IMAGE_WIDTH=1024
+CFG_SCALE=4.5
   ```
 
 ---
