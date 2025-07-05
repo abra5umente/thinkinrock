@@ -24,6 +24,8 @@ SCHEDULER_NAME="Karras"
 IMAGE_HEIGHT=1024
 IMAGE_WIDTH=1024
 CFG_SCALE=4.5
+AUTO1111_BAT="path\to\your\auto1111\bat\file"
+ENVIRONMENT_BAT="path\to\your\auto1111\environment\bat\file"
   ```
 
 ---

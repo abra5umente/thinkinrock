@@ -26,8 +26,8 @@ payload = {
     "width": img_width,
     "height": img_height
 }
-auto1111_bat = r"C:\Users\alexa\auto1111\run.bat"
-environment_bat = r"C:\Users\alexa\auto1111\environment.bat"
+auto1111_bat = os.environ.get(AUTO1111_BAT)
+environment_bat = os.environ.get(ENVIRONMENT_BAT)
 
 def start_auto1111():
     print("starting auto1111...")
