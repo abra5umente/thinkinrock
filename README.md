@@ -1,6 +1,6 @@
 # ThinkinRock
 
-**A playful Python script to wake up your "thinkin' rock" (Stable Diffusion via auto1111) and conjure images for you, automatically managing container or batch launch, prompt input, and image saving.**
+**A playful Python script to wake up your "thinkin' rock" (Stable Diffusion via auto1111) and conjure images for you, automatically managing batch launch and close, prompt input, and image saving.**
 
 ---
 
