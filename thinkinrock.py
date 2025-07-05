@@ -14,7 +14,7 @@ scheduler = os.environ.get("SCHEDULER_NAME") or "Karras"
 img_width = int(os.environ.get("IMAGE_WIDTH") or 1024)
 img_height = int(os.environ.get("IMAGE_HEIGHT") or 1024)
 cfg = float(os.environ.get("CFG_SCALE") or 4.5)
-steps = os.environ.get("STEPS") or 30
+steps = int(os.environ.get("STEPS") or 30)
 
 # set up variables
 payload = {
@@ -27,16 +27,18 @@ payload = {
     "height": img_height
 }
 auto1111_bat = r"C:\Users\alexa\auto1111\run.bat"
+environment_bat = r"C:\Users\alexa\auto1111\environment.bat"
 
 def start_auto1111():
     print("starting auto1111...")
     try:
         subprocess.Popen(
-            [auto1111_bat],
+            f'"{environment_bat}" && "{auto1111_bat}"',
             shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
             creationflags=subprocess.CREATE_NO_WINDOW
         )
-        print("auto1111 started successfully.")
     except Exception as e:
         print(f"Failed to start auto1111: {e}")
         exit(1)
@@ -44,35 +46,17 @@ def start_auto1111():
 def stop_auto1111():
     print("stopping auto1111...")
     try:
-        # Find python processes with the run.bat in their command line
-        result = subprocess.run(
-            [
-                "wmic", "process", "where",
-                f'CommandLine like "%%{auto1111_bat}%%" and Name=\'python.exe\'',
-                "get", "ProcessId", "/VALUE"
-            ],
-            capture_output=True, text=True
-        )
-        pids = [
-            line.split("=")[1].strip()
-            for line in result.stdout.splitlines()
-            if line.startswith("ProcessId=")
-        ]
-        if not pids:
-            print("No auto1111 process found to stop.")
-            return
-        for pid in pids:
-            subprocess.run(["taskkill", "/F", "/PID", pid], check=True)
-        print("auto1111 stopped successfully.")
+        server_stop = requests.post("http://localhost:7860/sdapi/v1/server-stop")
+        if server_stop.text.strip() == "Stopping.":
+            print("the rock has been put to bed.")
     except Exception as e:
         print(f"Failed to stop auto1111: {e}")
         exit(1)
-
+        
+    
 def check_auto1111_running():
-    print("checking if auto1111 is already running...")
-    if requests.get("http://localhost:7860/login_check/").status_code != 200:
-        print("auto1111 is not running, starting it now...")
-        return False
+    response = requests.get("http://localhost:7860/login_check/")
+    return response.status_code == 200
 
 
 # function to call auto1111 api endpoint
@@ -103,22 +87,39 @@ def create_image():
 
 # the actual script starts here
 
-auto1111_was_running = check_auto1111_running() != False
-try:
-    if not auto1111_was_running:
-        start_auto1111()
-    # here is where the actual things happen
+
+import time
+max_retries = 30
+for attempt in range(max_retries):
     try:
-        create_image()
-        print("the rock has produced a lovely image for you")
-    finally:
-        pass
+        if check_auto1111_running():
+            print("the rock has been woken up successfully")
+            break
+        else:
+            print("the rock is still sleeping, waking it up...")
+            start_auto1111()
+    except Exception as e:
+        print(f"the rock is still sleeping, waking it up...")
+        start_auto1111()
+    print(f"waiting for the rock to wake up({attempt+1}/{max_retries})")
+    time.sleep(2)
+else:
+    print("auto1111 did not start in time. Exiting.")
+    exit(1)
+
+try:
+    create_image()
+    print("the rock has produced a lovely image for you")
+    try:
+        stop_auto1111()
+    except Exception as e:
+        print(f"Error while stopping auto1111: {e}")
+        exit(1)
     exit(0)
 except KeyboardInterrupt:
     print("\nuser has decided to put the rock back to bed. goodnight rock!")
     try:
-        if not auto1111_was_running:
-            stop_auto1111()
+        stop_auto1111()
     except Exception as e:
         print(f"Error while stopping auto1111: {e}")
         exit(1)
